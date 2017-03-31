@@ -89,7 +89,8 @@ if (check_bitrix_sessid())
 
                       $NEWID = $mess['params']['users'];
                       $key   = array_keys($mess['params']['users'])[0];
-                      $NEWID = $NEWID[$key]['id'];
+                      $NEWID = (int)$NEWID[$key]['id'];
+                      array_push($arMessage,array("pid1"=>$NEWID));
                       break;
                        
                     }
@@ -98,7 +99,7 @@ if (check_bitrix_sessid())
 
                        $NEWID = (int)preg_replace("#\[USER=(\d+)\]#is","$1",$mess['params']['MESSAGE']['text']);
                          
-                      // array_push($arMessage,array("pid"=>$NEWID));
+                       array_push($arMessage,array("pid2"=>$NEWID));
 
                        break;
                     }
@@ -119,8 +120,6 @@ if (check_bitrix_sessid())
                      echo CUtil::PhpToJsObject(Array('ERROR' => 'not message '.$departamentID.'!='.$currDepartamentID));
 
                      $arMessage = null;
-
-                     CMain::FinalActions();
 
                      die();
 
