@@ -49,17 +49,24 @@ class CSearchUser
  $U = $USER->GetID();
  $arGroupCodes = array("AU","U".$U,"IU".$U,"SU".$U."_Z");
 
+ $systemGroup = array(2,3,4,14);
+
  $arGroups = CUser::GetUserGroup($U);
 
  foreach($arGroups as $GID) {
-   array_push($arGroupCodes,"G".$GID);
+  
+   if(in_array($GID, $systemGroup)) {
+       continue;
+   } else {
+     array_push($arGroupCodes,"G".$GID);
+   }
  }
 
  $addedUser     = CUser::GetByID($USER->GetID());
  $addedUserRs   = $addedUser->Fetch();
  $departamentID = $addedUserRs['UF_DEPARTMENT'][0];
  
- array_push($arGroupCodes,array("D".$departamentID,"DR".$departamentID));
+ array_push($arGroupCodes,"D".$departamentID,"DR".$departamentID);
 
  $f = fopen($_SERVER['DOCUMENT_ROOT']."/sm.txt","a");
  fwrite($f,json_encode($arGroupCodes).'/ '.date("H:i:s")."\n\r");

@@ -5,6 +5,49 @@ AddEventHandler("support","OnAfterTicketUpdate","reindexTickets");
 AddEventHandler("im", "OnBeforeMessageNotifyAdd", "OnBeforeMessageNotifyAddHandler");
 AddEventHandler("search", "OnSearchCheckPermissions", "OnSearchPermissionsHandler");
 
+function createNewLead($messFields) {
+
+ CModule::IncludeModule('crm');
+ CModule::IncludeModule('blog');	
+ CModule::IncludeModule('mail');	
+ $CCrmLead = new CCrmLead(false);
+
+ $emailfrom = CMailUtil::ExtractMailAddress($messFields['MESSAGE_AUTHOR_SID']);
+		$fullname = preg_replace('/<(.*?)>/','', $messFields['MESSAGE_AUTHOR_SID']);
+
+		if (filter_var($fullname, FILTER_VALIDATE_EMAIL)) { // IF FIELD FROM DONT HAVE NAME
+			$arFullName = explode("@", $fullname);
+			$fullname = $arFullName[0];
+		}
+
+		$assignedBy = 20;
+		$parserBlog = new blogTextParser(false, "/bitrix/images/socialnetwork/smile/");
+		$arAllow = array("HTML" => "Y", "ANCHOR" => "Y", "BIU" => "Y", "IMG" => "Y", "QUOTE" => "Y", "CODE" => "Y", "FONT" => "Y", "LIST" => "Y", "SMILES" => "Y", "NL2BR" => "Y", "VIDEO" => "Y");
+		$text4message = $parserBlog->convert($messFields['MESSAGE'], true, array(), $arAllow);
+
+		$arFields = array(
+			"TITLE" => $messFields['TITLE'],
+			"COMMENTS" => $text4message,
+			"NAME" => trim($fullname),
+			"STATUS_ID" => "NEW",
+			"ASSIGNED_BY_ID" => $assignedBy,
+			"CURRENCY_ID" => "USD",
+			"EXCH_RATE" => 1,
+			"FM" => array(
+				"EMAIL" => array(
+					"n1" => array(
+						"VALUE" => $emailfrom,
+						"VALUE_TYPE" => "WORK"
+					)
+				)
+			)
+		);
+
+		$ID = $CCrmLead->Add($arFields, true, array('REGISTER_SONET_EVENT' => true));
+		return $ID;
+
+}
+
 function OnSearchPermissionsHandler(&$FIELD) {
   return $FIELD;
 }
@@ -28,7 +71,7 @@ function OnBeforeMessageNotifyAddHandler(&$arFields) {
  fwrite($f,json_encode($arFields).'/ '.date("H:i:s")."\n\r");
  fclose($f);
 
- if($currentDepartamentID !== $departamentID) {
+/* if($currentDepartamentID !== $departamentID) {
 
    $arFields['TO_CHAT_ID'] = "";
 
@@ -36,7 +79,7 @@ function OnBeforeMessageNotifyAddHandler(&$arFields) {
 
  }
  
- return $arFields;
+ return $arFields;*/
  
 }
 
