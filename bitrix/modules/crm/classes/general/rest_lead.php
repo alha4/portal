@@ -100,6 +100,61 @@ class CCRMLeadRest
 		$arFields = array_merge($arFields, $CCrmUserType->PrepareExternalFormFields($arData, ','));
 		$arFields['FM'] = CCrmFieldMulti::PrepareFields($arData);
 
+                $exists = CCrmFieldMulti::GetList(
+                array(),
+                array(
+                   'VALUE' => $arData['EMAIL'],
+                   'ENTITY_ID' => 'LEAD',
+                   'COMPLEX_ID' => 'EMAIL_WORK'
+                  )
+                );
+ 
+                $rs = $exists->Fetch();
+
+                if($rs) {
+
+                  $entity_type = 'LEAD';
+                  $entity_id = $rs['ELEMENT_ID'];
+ 
+                   
+                  $now = ConvertTimeStamp(time() + CTimeZone::GetOffset(), 'FULL', 's1');
+
+                  $arBindings[] = array(
+                    'OWNER_TYPE_ID' => CCrmOwnerType::ResolveID($entity_type),
+                    'OWNER_ID' => $entity_id
+                  );
+
+                  $arActivity = array(
+                   'OWNER_ID' => $entity_id,
+                   'OWNER_TYPE_ID' => CCrmOwnerType::ResolveID($entity_type),
+                   'TYPE_ID' =>  CCrmActivityType::Email,
+                   'SUBJECT' => 'Message',
+                   'START_TIME' => $now,
+                   'END_TIME' => $now,
+                   'COMPLETED' => 'Y',
+                   'RESPONSIBLE_ID' => 1,
+                   'PRIORITY' => CCrmActivityPriority::Medium,
+                   'DESCRIPTION' => trim($arData['COMMENTS']),
+                   'DESCRIPTION_TYPE' => CCrmContentType::BBCode,
+                   'DIRECTION' => CCrmActivityDirection::Outgoing,
+                   'LOCATION' => '',
+                   'NOTIFY_TYPE' => CCrmActivityNotifyType::None,
+                   'BINDINGS' => array_values($arBindings)
+                  );
+
+                  if(CCrmActivity::Add($arActivity, false, false, array('REGISTER_SONET_EVENT' => true))) {
+
+                         $res = array('error' => 201, 'ID' => $ID, 'error_message' => GetMessage('CRM_REST_OK'));
+
+                  } else {
+
+                         $res =  array('error' => 400, 'error_message' => "error activity create");
+
+                 }
+                 file_put_contents($_SERVER['DOCUMENT_ROOT'].'/lresterr.txt',json_encode($res).' '.$now);
+
+                } else { 
+
 		$DB->StartTransaction();
 
 		$ID = $CCrmLead->Add($arFields);
@@ -140,8 +195,10 @@ class CCRMLeadRest
 
 			$res = array('error' => 201, 'ID' => $ID, 'error_message' => GetMessage('CRM_REST_OK'));
 		}
+               file_put_contents($_SERVER['DOCUMENT_ROOT'].'/lresterr.txt',json_encode($res).' '.$now);
+             }
 
-		return self::_out($res);
+             return self::_out($res);
 	}
 
 	public static function AddLeadBundle($arLeads, $CCrmLead)
