@@ -103,15 +103,15 @@ class CCRMLeadRest
                 $exists = CCrmFieldMulti::GetList(
                 array(),
                 array(
-                   'VALUE' => $arData['EMAIL'],
+                   'VALUE' => $arData['FM']['EMAIL']['n2']['VALUE'],
                    'ENTITY_ID' => 'LEAD',
-                   'COMPLEX_ID' => 'EMAIL_WORK'
+                   'COMPLEX_ID' => 'EMAIL_HOME'
                   )
                 );
  
                 $rs = $exists->Fetch();
 
-                if($rs) {
+                if($rs['ELEMENT_ID']) {
 
                   $entity_type = 'LEAD';
                   $entity_id = $rs['ELEMENT_ID'];
@@ -144,7 +144,7 @@ class CCRMLeadRest
 
                   if(CCrmActivity::Add($arActivity, false, false, array('REGISTER_SONET_EVENT' => true))) {
 
-                         $res = array('error' => 201, 'ID' => $ID, 'error_message' => GetMessage('CRM_REST_OK'));
+                         $res = array('error' => 201, 'ID' => $ID, 'error_message' =>$entity_id.' Activity added '.$arData['FM']['EMAIL']['n2']['VALUE']);
 
                   } else {
 
