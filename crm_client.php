@@ -7,6 +7,12 @@ class CrmClient {
 
   public static function sendToCRM(array $params) {
 
+  if(!array_key_exists('TITLE',$params) || !array_key_exists('EMAIL_HOME',$params) 
+     || !array_key_exists('NAME',$params)) {
+
+     return false;
+  }
+
   $default_params = array(
     "LOGIN" => "admin",
     "PASSWORD" => "212121",
@@ -20,9 +26,9 @@ class CrmClient {
   $http_client->setParams($params);
   $responce = $http_client->send(true);
 
-  if($responce) {
+  if($responce['error'] == 201) {
 
-      return $responce['error'];
+      return true;
   }
 
   return false;
