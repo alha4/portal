@@ -1,9 +1,10 @@
 {
  "name" : "crmclient",
-  "require" : {
+ "type": "library",
+ "homepage": "https://github.com/alha4/portal",
+ "require" : {
     "php" : ">=5.4",
-    "ext-curl" : "*"
-    
+    "ext-curl" : "*" 
   },
   "repositories" : [{ 
    "type" : "git",
