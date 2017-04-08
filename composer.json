@@ -2,14 +2,18 @@
  "name" : "crmclient",
  "type": "library",
  "homepage": "https://github.com/alha4/portal",
+ "reference" : "origin",
  "require" : {
     "php" : ">=5.4",
     "ext-curl" : "*" 
   },
+  "autoload": {
+     "classmap": ["CurlClient.php","CrmClient.php"]
+  },
   "repositories" : [{ 
    "type" : "git",
-    "url" : "https://github.com/alha4/portal",
-    "reference" : "origin"
+   "url" : "https://github.com/alha4/portal",
+   "reference" : "origin"
  }]
 
 }
