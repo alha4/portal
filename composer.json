@@ -7,6 +7,12 @@
  "reference" : "origin",
  "version": "1.0.0",
  "license": "MIT",
+ "authors": [
+        {
+            "name": "Igor Achkasov",
+            "email": "alfa4you@yandex.ru"
+        }
+    ],
  "require" : {
     "php" : ">=5.4",
     "ext-curl" : "*" 
